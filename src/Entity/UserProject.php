@@ -14,11 +14,11 @@ class UserProject
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'userProjects')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'userProjects')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
-    #[ORM\ManyToOne(inversedBy: 'userProjects')]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'userProjects')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
 
