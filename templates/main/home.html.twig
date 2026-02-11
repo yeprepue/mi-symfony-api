@@ -1,0 +1,195 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inicio - Time Manager{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<div class="header-gradient py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-clock-history"></i> Time Manager
+                </h1>
+                <p class="lead mb-4">
+                    Sistema profesional para gestionar tareas, proyectos y tarifas por usuario.
+                    Controla horas trabajadas y calcula valores automáticamente.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#users" class="btn btn-light btn-lg">
+                        <i class="bi bi-people"></i> Ver Usuarios
+                    </a>
+                    <a href="{{ path('api_user_tasks', {id: 1}) }}" class="btn btn-outline-light btn-lg" target="_blank">
+                        <i class="bi bi-code-slash"></i> Probar API
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="bg-white rounded-circle p-4 d-inline-block">
+                    <i class="bi bi-graph-up display-1 text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Estadísticas -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card total-card text-white card-shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">USUARIOS</h6>
+                            <h2 class="card-title">{{ total_users }}</h2>
+                        </div>
+                        <i class="bi bi-people display-6 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card bg-success text-white card-shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">PROYECTOS</h6>
+                            <h2 class="card-title">{{ total_projects }}</h2>
+                        </div>
+                        <i class="bi bi-diagram-3 display-6 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card bg-info text-white card-shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">TAREAS</h6>
+                            <h2 class="card-title">{{ total_tasks }}</h2>
+                        </div>
+                        <i class="bi bi-list-task display-6 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Usuarios -->
+    <div class="card card-shadow mb-5" id="users">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">
+                <i class="bi bi-people"></i> Usuarios del Sistema
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for user in users %}
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card h-100 card-shadow">
+                        <div class="card-body text-center">
+                            <div class="bg-primary rounded-circle p-3 d-inline-block mb-3">
+                                <i class="bi bi-person text-white display-6"></i>
+                            </div>
+                            <h5 class="card-title">{{ user.email }}</h5>
+                            <p class="text-muted">
+                                {% if 'ROLE_ADMIN' in user.roles %}
+                                <span class="badge bg-danger">Administrador</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Usuario</span>
+                                {% endif %}
+                            </p>
+                            <a href="{{ path('web_user_tasks', {id: user.id}) }}"
+                                class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> Ver Tareas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-people display-1 text-muted"></i>
+                    <h4 class="mt-3 text-muted">No hay usuarios</h4>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Información Técnica -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <div class="card card-shadow h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-database"></i> Estructura de Base de Datos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Tabla</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>user</code></td>
+                                    <td>Usuarios del sistema</td>
+                                </tr>
+                                <tr>
+                                    <td><code>project</code></td>
+                                    <td>Proyectos disponibles</td>
+                                </tr>
+                                <tr>
+                                    <td><code>user_project</code></td>
+                                    <td>Relación N:N con tarifa personalizada</td>
+                                </tr>
+                                <tr>
+                                    <td><code>task</code></td>
+                                    <td>Tareas registradas con horas</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card card-shadow h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-code-slash"></i> Endpoints API
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>GET <code>/api/users/{id}/tasks</code></h6>
+                        <p class="text-muted mb-0">Obtiene tareas de un usuario con cálculo de valor</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Respuesta JSON ejemplo:</h6>
+                        <pre class="bg-light p-3 rounded"><code>{
+    "success": true,
+    "user_id": 1,
+    "tasks": [
+    {
+        "id": 1,
+        "description": "API de productos",
+        "hours_spent": "8.50",
+        "hourly_rate": 50.00,
+        "total_value": 425.00
+    }
+    ]
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

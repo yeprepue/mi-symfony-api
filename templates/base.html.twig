@@ -1,17 +1,223 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Time Manager - Gestión de Tareas{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⏱️</text></svg>">
+        
         {% block stylesheets %}
+            <!-- Bootstrap 5 -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <!-- Bootstrap Icons -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+            <!-- DataTables -->
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+            <!-- Estilos personalizados -->
+            <style>
+                :root {
+                    --primary-color: #4e54c8;
+                    --secondary-color: #8f94fb;
+                    --success-color: #20c997;
+                    --light-bg: #f8f9fa;
+                }
+                
+                body {
+                    background-color: var(--light-bg);
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                
+                .navbar-brand {
+                    font-weight: 600;
+                }
+                
+                .header-gradient {
+                    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                    color: white;
+                }
+                
+                .card-shadow {
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    transition: transform 0.3s ease;
+                }
+                
+                .card-shadow:hover {
+                    transform: translateY(-2px);
+                }
+                
+                .stat-card {
+                    border: none;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                
+                .total-card {
+                    background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+                    color: white;
+                    border: none;
+                }
+                
+                .table-hover tbody tr:hover {
+                    background-color: rgba(78, 84, 200, 0.05);
+                }
+                
+                .badge-project {
+                    background-color: var(--primary-color);
+                }
+                
+                .badge-hours {
+                    background-color: var(--success-color);
+                }
+                
+                footer {
+                    background-color: #343a40;
+                    color: white;
+                }
+            </style>
         {% endblock %}
 
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <!-- Importmap de Symfony (dejar para assets) -->
+            {{ importmap('app') }}
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark header-gradient">
+            <div class="container">
+                <a class="navbar-brand" href="{{ path('app_home') }}">
+                    <i class="bi bi-clock-history me-2"></i>Time Manager
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link {{ app.request.get('_route') == 'app_home' ? 'active' : '' }}" 
+                               href="{{ path('app_home') }}">
+                                <i class="bi bi-house"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button" 
+                               data-bs-toggle="dropdown">
+                                <i class="bi bi-people"></i> Usuarios
+                            </a>
+                            <ul class="dropdown-menu">
+                                {% for user in users|default([]) %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('web_user_tasks', {id: user.id}) }}">
+                                        <i class="bi bi-person"></i> {{ user.email }}
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li><a class="dropdown-item" href="#">Cargando usuarios...</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('api_user_tasks', {id: 1}) }}" target="_blank">
+                                <i class="bi bi-code-slash"></i> API
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                                <i class="bi bi-info-circle"></i> Acerca de
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenido principal -->
+        <main class="py-4">
+            {% block body %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-5 py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-clock-history"></i> Time Manager</h5>
+                        <p>Sistema de gestión de tareas y proyectos con cálculo de tarifas.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0">
+                            <small>
+                                Symfony 6.4 | PostgreSQL | Bootstrap 5<br>
+                                API REST disponible en <code>/api/users/{id}/tasks</code>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+                <hr class="bg-light">
+                <div class="text-center">
+                    <small>&copy; {{ "now"|date("Y") }} - Sistema de Gestión de Tareas</small>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Modal Acerca de -->
+        <div class="modal fade" id="aboutModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Acerca de Time Manager</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Tecnologías utilizadas:</h6>
+                        <ul>
+                            <li>Symfony 6.4 (Framework PHP)</li>
+                            <li>PostgreSQL 15 (Base de datos)</li>
+                            <li>Doctrine ORM (Mapeo objeto-relacional)</li>
+                            <li>API REST nativa</li>
+                            <li>Twig + Bootstrap 5 (Frontend)</li>
+                        </ul>
+                        <h6>Características:</h6>
+                        <ul>
+                            <li>Usuarios con múltiples proyectos</li>
+                            <li>Tarifa personalizada por usuario/proyecto</li>
+                            <li>Registro de tareas con horas</li>
+                            <li>Cálculo automático de valores</li>
+                            <li>API REST y vista web</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts externos -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+        
+        <script>
+            // Inicializar DataTables en tablas que tengan la clase 'datatable'
+            $(document).ready(function() {
+                $('.datatable').DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                    },
+                    pageLength: 10,
+                    responsive: true
+                });
+                
+                // Tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            });
+        </script>
+        
+        {% block extra_javascripts %}{% endblock %}
     </body>
 </html>
