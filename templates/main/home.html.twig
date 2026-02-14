@@ -37,43 +37,49 @@
     <!-- Estadísticas -->
     <div class="row mb-5">
         <div class="col-md-4 mb-4">
-            <div class="card stat-card total-card text-white card-shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-2">USUARIOS</h6>
-                            <h2 class="card-title">{{ total_users }}</h2>
+            <a href="{{ path('user_index') }}" class="text-decoration-none">
+                <div class="card stat-card total-card text-white card-shadow card-clickable">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2">USUARIOS</h6>
+                                <h2 class="card-title">{{ total_users }}</h2>
+                            </div>
+                            <i class="bi bi-people display-6 opacity-75"></i>
                         </div>
-                        <i class="bi bi-people display-6 opacity-75"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card stat-card bg-success text-white card-shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-2">PROYECTOS</h6>
-                            <h2 class="card-title">{{ total_projects }}</h2>
+            <a href="{{ path('project_index') }}" class="text-decoration-none">
+                <div class="card stat-card bg-success text-white card-shadow card-clickable">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2">PROYECTOS</h6>
+                                <h2 class="card-title">{{ total_projects }}</h2>
+                            </div>
+                            <i class="bi bi-diagram-3 display-6 opacity-75"></i>
                         </div>
-                        <i class="bi bi-diagram-3 display-6 opacity-75"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card stat-card bg-info text-white card-shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-2">TAREAS</h6>
-                            <h2 class="card-title">{{ total_tasks }}</h2>
+            <a href="{{ path('task_index') }}" class="text-decoration-none">
+                <div class="card stat-card bg-info text-white card-shadow card-clickable">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2">TAREAS</h6>
+                                <h2 class="card-title">{{ total_tasks }}</h2>
+                            </div>
+                            <i class="bi bi-list-task display-6 opacity-75"></i>
                         </div>
-                        <i class="bi bi-list-task display-6 opacity-75"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 

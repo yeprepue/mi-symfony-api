@@ -51,6 +51,16 @@
                     overflow: hidden;
                 }
                 
+                .card-clickable {
+                    cursor: pointer;
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                }
+                
+                .card-clickable:hover {
+                    transform: scale(1.02);
+                    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+                }
+                
                 .total-card {
                     background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
                     color: white;
@@ -100,9 +110,32 @@
                             </a>
                         </li>
                         <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="crudDropdown" role="button" 
+                               data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> Gestión
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('task_index') }}">
+                                        <i class="bi bi-check2-square"></i> Tareas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('project_index') }}">
+                                        <i class="bi bi-folder"></i> Proyectos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('user_index') }}">
+                                        <i class="bi bi-people"></i> Usuarios
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button" 
                                data-bs-toggle="dropdown">
-                                <i class="bi bi-people"></i> Usuarios
+                                <i class="bi bi-person-lines-fill"></i> Ver Tareas
                             </a>
                             <ul class="dropdown-menu">
                                 {% for user in users|default([]) %}

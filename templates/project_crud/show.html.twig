@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ver Proyecto - Time Manager{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header header-gradient">
+                    <h3><i class="bi bi-eye"></i> Detalles del Proyecto</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="text-muted">ID:</th>
+                            <td>{{ project.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Nombre:</th>
+                            <td><strong>{{ project.name }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Descripción:</th>
+                            <td>{{ project.descripcion }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Tareas:</th>
+                            <td><span class="badge bg-secondary">{{ project.tasks|length }}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Usuarios:</th>
+                            <td><span class="badge bg-info">{{ project.userProjects|length }}</span></td>
+                        </tr>
+                    </table>
+                    
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{{ path('project_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <div>
+                            <a href="{{ path('project_edit', {'id': project.id}) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="post" action="{{ path('project_delete', {'id': project.id}) }}" style="display: inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ project.id) }}">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de eliminar este proyecto?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
