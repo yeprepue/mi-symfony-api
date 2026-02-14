@@ -44,7 +44,7 @@
                             </a>
                             <form method="post" action="{{ path('project_delete', {'id': project.id}) }}" style="display: inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ project.id) }}">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de eliminar este proyecto?')">
+                                <button type="button" class="btn btn-danger btn-delete-swal" data-item-name="el proyecto '{{ project.name|e('html_attr') }}'">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
                             </form>

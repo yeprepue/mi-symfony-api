@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class TaskWebController extends AbstractController
 {
@@ -15,9 +16,24 @@ class TaskWebController extends AbstractController
     public function showUserTasks(
         User $user,
         TaskRepository $taskRepository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        AuthorizationCheckerInterface $authChecker
     ): Response
     {
+        // Obtener el usuario actualmente autenticado
+        $currentUser = $this->getUser();
+        
+        // Verificar si el usuario tiene rol de admin
+        $isAdmin = $authChecker->isGranted('ROLE_ADMIN');
+        
+        // Si no es admin, solo puede ver sus propias tareas
+        if (!$isAdmin) {
+            // Verificar que el usuario actual coincida con el usuario solicitado
+            if (!$currentUser || !($currentUser instanceof User) || $currentUser->getId() !== $user->getId()) {
+                throw $this->createAccessDeniedException('No tienes permiso para ver las tareas de otros usuarios.');
+            }
+        }
+        
         // Obtener tareas del usuario con proyecto y tarifa
         $tasks = $taskRepository->findTasksWithProjectAndRate($user);
         

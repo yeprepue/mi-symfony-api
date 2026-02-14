@@ -18,7 +18,7 @@ class Task
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
-    private ?string $hoursSpent = null;
+    private ?string $hoursSpent = '0.00';
 
     #[ORM\Column]
     private ?\DateTime $createdAt = null;
@@ -31,9 +31,27 @@ class Task
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
 
+    // Campos para control de tiempo
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $startedAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $lastResumeAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $finishedAt = null;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $isRunning = false;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $accumulatedTime = '0.00';
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->hoursSpent = '0.00';
+        $this->accumulatedTime = '0.00';
     }
 
     public function getId(): ?int
@@ -99,5 +117,129 @@ class Task
         $this->project = $project;
 
         return $this;
+    }
+
+    // Getters y setters para control de tiempo
+
+    public function getStartedAt(): ?\DateTime
+    {
+        return $this->startedAt;
+    }
+
+    public function setStartedAt(?\DateTime $startedAt): static
+    {
+        $this->startedAt = $startedAt;
+
+        return $this;
+    }
+
+    public function getLastResumeAt(): ?\DateTime
+    {
+        return $this->lastResumeAt;
+    }
+
+    public function setLastResumeAt(?\DateTime $lastResumeAt): static
+    {
+        $this->lastResumeAt = $lastResumeAt;
+
+        return $this;
+    }
+
+    public function getFinishedAt(): ?\DateTime
+    {
+        return $this->finishedAt;
+    }
+
+    public function setFinishedAt(?\DateTime $finishedAt): static
+    {
+        $this->finishedAt = $finishedAt;
+
+        return $this;
+    }
+
+    public function isIsRunning(): bool
+    {
+        return $this->isRunning;
+    }
+
+    public function setIsRunning(bool $isRunning): static
+    {
+        $this->isRunning = $isRunning;
+
+        return $this;
+    }
+
+    public function getAccumulatedTime(): ?string
+    {
+        return $this->accumulatedTime;
+    }
+
+    public function setAccumulatedTime(?string $accumulatedTime): static
+    {
+        $this->accumulatedTime = $accumulatedTime;
+
+        return $this;
+    }
+
+    /**
+     * Inicia el temporizador de la tarea
+     */
+    public function start(): void
+    {
+        $this->isRunning = true;
+        $this->startedAt = new \DateTime();
+        $this->lastResumeAt = new \DateTime();
+    }
+
+    /**
+     * Pausa el temporizador de la tarea
+     */
+    public function pause(): void
+    {
+        if ($this->isRunning && $this->lastResumeAt) {
+            $now = new \DateTime();
+            $diff = $now->getTimestamp() - $this->lastResumeAt->getTimestamp();
+            $hours = $diff / 3600;
+            
+            $currentAccumulated = floatval($this->accumulatedTime ?? '0');
+            $this->accumulatedTime = number_format($currentAccumulated + $hours, 2, '.', '');
+        }
+        $this->isRunning = false;
+    }
+
+    /**
+     * Detiene el temporizador y calcula las horas finales
+     */
+    public function stop(): void
+    {
+        if ($this->isRunning && $this->lastResumeAt) {
+            $now = new \DateTime();
+            $diff = $now->getTimestamp() - $this->lastResumeAt->getTimestamp();
+            $hours = $diff / 3600;
+            
+            $currentAccumulated = floatval($this->accumulatedTime ?? '0');
+            $this->accumulatedTime = number_format($currentAccumulated + $hours, 2, '.', '');
+        }
+        
+        $this->isRunning = false;
+        $this->finishedAt = new \DateTime();
+        $this->hoursSpent = $this->accumulatedTime;
+    }
+
+    /**
+     * Obtiene las horas actuales (incluyendo tiempo en curso)
+     */
+    public function getCurrentHours(): string
+    {
+        if ($this->isRunning && $this->lastResumeAt) {
+            $now = new \DateTime();
+            $diff = $now->getTimestamp() - $this->lastResumeAt->getTimestamp();
+            $hours = $diff / 3600;
+            
+            $currentAccumulated = floatval($this->accumulatedTime ?? '0');
+            return number_format($currentAccumulated + $hours, 2, '.', '');
+        }
+        
+        return $this->accumulatedTime ?? '0.00';
     }
 }

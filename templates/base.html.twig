@@ -13,6 +13,8 @@
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
             <!-- DataTables -->
             <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+            <!-- SweetAlert2 -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
             <!-- Estilos personalizados -->
             <style>
                 :root {
@@ -109,6 +111,7 @@
                                 <i class="bi bi-house"></i> Inicio
                             </a>
                         </li>
+                        {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="crudDropdown" role="button" 
                                data-bs-toggle="dropdown">
@@ -149,6 +152,16 @@
                                 {% endfor %}
                             </ul>
                         </li>
+                        {% else %}
+                        {# Usuario regular: solo puede ver sus propias tareas #}
+                        {% if app.user %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('web_user_tasks', {id: app.user.id}) }}">
+                                <i class="bi bi-check2-square"></i> Mis Tareas
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('api_user_tasks', {id: 1}) }}" target="_blank">
                                 <i class="bi bi-code-slash"></i> API
@@ -159,6 +172,13 @@
                                 <i class="bi bi-info-circle"></i> Acerca de
                             </a>
                         </li>
+                        {% if app.user %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Salir ({{ app.user.email }})
+                            </a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -231,6 +251,8 @@
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         
         <script>
             // Inicializar DataTables en tablas que tengan la clase 'datatable'
@@ -251,6 +273,58 @@
             });
         </script>
         
+        <!-- SweetAlert2: Flash messages como Toast -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Toast para mensajes flash de éxito
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
+
+                // Mostrar flash messages con Toast
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        Toast.fire({
+                            icon: '{{ label == "success" ? "success" : (label == "error" ? "error" : (label == "warning" ? "warning" : "info")) }}',
+                            title: '{{ message|e('js') }}'
+                        });
+                    {% endfor %}
+                {% endfor %}
+
+                // Confirmación de eliminación con SweetAlert2
+                document.querySelectorAll('.btn-delete-swal').forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const form = this.closest('form');
+                        const itemName = this.getAttribute('data-item-name') || 'este elemento';
+                        Swal.fire({
+                            title: '¿Estás seguro?',
+                            text: 'Se eliminará ' + itemName + '. Esta acción no se puede deshacer.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: '<i class="bi bi-trash"></i> Sí, eliminar',
+                            cancelButtonText: '<i class="bi bi-x-circle"></i> Cancelar',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
+            });
+        </script>
+
         {% block extra_javascripts %}{% endblock %}
     </body>
 </html>

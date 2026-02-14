@@ -11,13 +11,6 @@
         </a>
     </div>
 
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {% endfor %}
-
     <div class="card shadow">
         <div class="card-body">
             <table class="table table-hover">
@@ -54,7 +47,7 @@
                                 </a>
                                 <form method="post" action="{{ path('user_delete', {'id': user.id}) }}" style="display: inline-block;">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este usuario?')">
+                                    <button type="button" class="btn btn-sm btn-danger btn-delete-swal" data-item-name="el usuario '{{ user.email|e('html_attr') }}'">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
