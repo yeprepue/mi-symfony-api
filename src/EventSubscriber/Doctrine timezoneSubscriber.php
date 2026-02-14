@@ -3,13 +3,17 @@
 namespace App\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-use Doctrine\ORM\Events;
 
-#[AsDoctrineListener(event: Events::postConnect)]
+#[AsDoctrineListener(event: 'postConnect')]
 class DoctrineTimezoneSubscriber
 {
-    public function postConnect(LoadClassMetadataEventArgs $args): void
+    /**
+     * Establece la zona horaria de la conexión a la base de datos
+     * según la zona horaria configurada en PHP
+     *
+     * @param mixed $args Doctrine\DBAL\Event\ConnectionEventArgs
+     */
+    public function postConnect($args): void
     {
         $connection = $args->getConnection();
         
