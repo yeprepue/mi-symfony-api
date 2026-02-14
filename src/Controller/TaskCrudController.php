@@ -10,8 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/tasks')]
+#[IsGranted('ROLE_ADMIN')]
 class TaskCrudController extends AbstractController
 {
     #[Route('/', name: 'task_index', methods: ['GET'])]

@@ -11,8 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/users')]
+#[IsGranted('ROLE_ADMIN')]
 class UserCrudController extends AbstractController
 {
     #[Route('/', name: 'user_index', methods: ['GET'])]
